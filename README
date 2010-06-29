@@ -1,0 +1,40 @@
+
+
+Amazonで使うには，.emacs等に以下の設定をする．
+
+(setq org-protocol-protocol-alist
+      '(("org-amazon"
+         :protocol "amazon"
+         :function org-protocol-amazon)))
+
+(defun org-protocol-amazon (info)
+  (if (and (boundp 'org-stored-links)
+           (fboundp 'org-remember))
+      (let* ((parts (org-protocol-split-data info t))
+             (template (or (and (= 1 (length (car parts))) (pop parts))
+                           org-protocol-default-template-key))
+             (title (or (nth 0 parts) ""))
+             (author (or (nth 1 parts) ""))
+             (publisher (or (let ((string (nth 2 parts)))
+                              (string-match "出版社: \\(.*\\) (.*)" string)
+                              (match-string 1 string))
+                            ""))
+             (isbn10 (or (let ((string (nth 3 parts)))
+                           (string-match "ISBN-10: \\(.*\\)" string)
+                           (match-string 1 string))
+                         ""))
+             (date (or (let ((string (nth 4 parts)))
+                         (string-match "発売日. \\(.*\\)" string)
+                         (match-string 1 string))
+                       ""))
+             (orglink (concat title ))
+             remember-annotation-functions)
+        (kill-new orglink)
+        (raise-frame)
+        (org-remember nil (string-to-char "w"))
+        (org-entry-put (point) "Author" author)
+        (org-entry-put (point) "Publisher" publisher)
+        (org-entry-put (point) "ISBN-10" isbn10)
+        (org-entry-put (point) "DATE" date))
+    (message "Org-mode not loaded."))
+  nil)
