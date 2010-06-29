@@ -52,6 +52,29 @@ let PLUGIN_INFO =
                 + encodeURIComponent(window.content.document.URL) 
                 + "/" + encodeURIComponent(window.content.document.title) 
                 + "/" + encodeURIComponent(window.getSelection());
+        } else if (arg == "amazon") {
+            rememberTemplate = "";
+            var xpath = window.content.document.evaluate("//*[@id=\"btAsinTitle\"]",window.content.document,null,7,null);
+            var title = xpath.snapshotItem(0).textContent;
+
+            var xpath = window.content.document.evaluate("/html/body/div[2]/form/div/a",window.content.document,null,7,null);
+            var author = xpath.snapshotItem(0).textContent;
+
+            var xpath = window.content.document.evaluate("/html/body/div[2]/table/tbody/tr/td/div/ul/li[2]",window.content.document,null,7,null);
+            var publisher = xpath.snapshotItem(0).textContent.replace("/", "-", "g");
+
+            var xpath = window.content.document.evaluate("/html/body/div[2]/table/tbody/tr/td/div/ul/li[3]",window.content.document,null,7,null);
+            var isbn10 = xpath.snapshotItem(0).textContent;
+
+            var xpath = window.content.document.evaluate("/html/body/div[2]/table/tbody/tr/td/div/ul/li[5]",window.content.document,null,7,null);
+            var date = xpath.snapshotItem(0).textContent.replace("/", "-", "g");
+
+            var url = "amazon://" + rememberTemplate 
+                + "/" + title
+                + "/" + author
+                + "/" + publisher
+                + "/" + isbn10
+                + "/" + date;
         } else {
             var url = ""
         }
@@ -101,6 +124,7 @@ let PLUGIN_INFO =
                 context.completions = [
                     ["store-link", "store-link"],
                     ["remember", "remember"],
+                    ["amazon", "amazon"],
                 ];
             },
         },
